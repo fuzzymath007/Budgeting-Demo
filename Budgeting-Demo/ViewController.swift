@@ -22,9 +22,9 @@ class ViewController: UIViewController, UITableViewDataSource {
             textField0.placeholder = "Location"
         }
         
-        alert.addTextFieldWithConfigurationHandler { (textField1) in
-            textField1.placeholder = "Cost"
-        }
+//        alert.addTextFieldWithConfigurationHandler { (textField1) in
+//            textField1.placeholder = "Cost"
+//        }
         
         
         
@@ -32,7 +32,7 @@ class ViewController: UIViewController, UITableViewDataSource {
             style: .Default) { (action: UIAlertAction!) -> Void in
                 
                 let textField0 = alert.textFields![0] as UITextField
-                let textField1 = alert.textFields![1] as UITextField
+      //          let textField1 = alert.textFields![1] as UITextField
                 self.saveLocation(textField0.text)
   //              self.saveCost(textField1.text)
                 self.tableView.reloadData()
@@ -62,6 +62,32 @@ class ViewController: UIViewController, UITableViewDataSource {
             forCellReuseIdentifier: "Cell")
     }
     
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        //1
+        let appDelegate =
+        UIApplication.sharedApplication().delegate as AppDelegate
+        
+        let managedContext = appDelegate.managedObjectContext!
+        
+        //2
+        let fetchRequest = NSFetchRequest(entityName:"Transaction")
+        
+        //3
+        var error: NSError?
+        
+        let fetchedResults =
+        managedContext.executeFetchRequest(fetchRequest,
+            error: &error) as [NSManagedObject]?
+        
+        if let results = fetchedResults {
+            transactions = results
+        } else {
+            println("Could not fetch \(error), \(error!.userInfo)")
+        }
+    }
+    
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return transactions.count
     }
@@ -84,7 +110,7 @@ class ViewController: UIViewController, UITableViewDataSource {
         
         let transaction = NSManagedObject(entity: entry!, insertIntoManagedObjectContext: managedContext)
         
-        transaction.setValue(location, forKey: "Transaction")
+        transaction.setValue(location, forKey: "location")
         
         var error: NSError?
         if !managedContext.save(&error){
