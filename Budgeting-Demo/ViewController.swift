@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 
 class ViewController: UIViewController, UITableViewDataSource {
 
@@ -31,7 +32,9 @@ class ViewController: UIViewController, UITableViewDataSource {
             style: .Default) { (action: UIAlertAction!) -> Void in
                 
                 let textField0 = alert.textFields![0] as UITextField
-                self.transactions.append(textField0.text)
+                let textField1 = alert.textFields![1] as UITextField
+                self.saveLocation(textField0.text)
+  //              self.saveCost(textField1.text)
                 self.tableView.reloadData()
         }
         
@@ -49,7 +52,7 @@ class ViewController: UIViewController, UITableViewDataSource {
     }
 
     
-    var transactions = [String]()
+    var transactions = [NSManagedObject]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -66,9 +69,29 @@ class ViewController: UIViewController, UITableViewDataSource {
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell") as UITableViewCell
         
-        cell.textLabel!.text = transactions[indexPath.row]
+        let transaction = transactions[indexPath.row]
+        
+        cell.textLabel!.text = transaction.valueForKey("location") as String?
         
         return cell
+    }
+    
+    func saveLocation(location: String){
+        let appDelegate = UIApplication.sharedApplication().delegate as AppDelegate
+        let managedContext = appDelegate.managedObjectContext!
+        
+        let entry = NSEntityDescription.entityForName("Transaction", inManagedObjectContext: managedContext)
+        
+        let transaction = NSManagedObject(entity: entry!, insertIntoManagedObjectContext: managedContext)
+        
+        transaction.setValue(location, forKey: "Transaction")
+        
+        var error: NSError?
+        if !managedContext.save(&error){
+            println("Could not save")
+        }
+        
+        transactions.append(transaction)
     }
     
     override func didReceiveMemoryWarning() {
