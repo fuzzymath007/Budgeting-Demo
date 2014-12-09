@@ -33,9 +33,9 @@ class ViewController: UIViewController, UITableViewDataSource {
                 
                 let textField0 = alert.textFields![0] as UITextField
                 let textField1 = alert.textFields![1] as UITextField
-                self.saveLocation(textField0.text)
                 var cost = (textField1.text as NSString).floatValue
-                self.saveCost(cost)
+                self.savetransaction(textField0.text, cost: cost)
+
                 self.tableView.reloadData()
         }
         
@@ -100,14 +100,14 @@ class ViewController: UIViewController, UITableViewDataSource {
         
         println(transactions)
         
-  //      cell.textLabel!.text = transaction.valueForKey("location") as String?
-//        cell.detailTextLabel!.text = transaction.valueForKey("cost") as String?
+        cell.textLabel.text = transaction.valueForKey("location") as String?
+        cell.detailTextLabel.text = transaction.valueForKey("cost") as String?
         
         
         return cell
     }
     
-    func saveLocation(location: String){
+    func savetransaction(location: String, cost: Float){
         let appDelegate = UIApplication.sharedApplication().delegate as AppDelegate
         let managedContext = appDelegate.managedObjectContext!
         
@@ -116,6 +116,7 @@ class ViewController: UIViewController, UITableViewDataSource {
         let transaction = NSManagedObject(entity: entry!, insertIntoManagedObjectContext: managedContext)
         
         transaction.setValue(location, forKey: "location")
+        transaction.setValue(cost, forKey: "cost")
         
         var error: NSError?
         if !managedContext.save(&error){
@@ -125,22 +126,6 @@ class ViewController: UIViewController, UITableViewDataSource {
         transactions.append(transaction)
     }
     
-    func saveCost(cost: Float){
-        let appDelegate = UIApplication.sharedApplication().delegate as AppDelegate
-        let managedContext = appDelegate.managedObjectContext!
-        
-        let entry = NSEntityDescription.entityForName("Transaction", inManagedObjectContext: managedContext)
-        let transaction = NSManagedObject(entity: entry!, insertIntoManagedObjectContext: managedContext)
-        
-        transaction.setValue(cost, forKey: "cost")
-        var error: NSError?
-        if !managedContext.save(&error){
-            println("Could not save")
-        }
-        
-        transactions.append(transaction)
-        
-    }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
